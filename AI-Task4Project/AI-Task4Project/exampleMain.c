@@ -29,15 +29,15 @@ int main(int argc, const char * argv[])
 {
     
     int sample, trainingsamples=0,testsamples=0,feature=0;
-    int ok=1;
-    int correct=0, wrong=0;
+    int ok = 1;
+    int correct = 0, wrong = 0;
     char prediction;
     int returnval=0;
-    double   mySample[NUM_FEATURES];
+    double  mySample[NUM_FEATURES];
     
     //allocate space for data storage
     double **trainingSet = calloc(NUM_TRAINING_SAMPLES , sizeof(double *));
-    for(sample=0;sample < NUM_TRAINING_SAMPLES; sample++)
+    for(sample = 0; sample < NUM_TRAINING_SAMPLES; sample++)
         trainingSet[sample] = calloc(NUM_FEATURES, sizeof(double));
     
                                   
@@ -53,9 +53,9 @@ int main(int argc, const char * argv[])
     
     //simple 2/3: 1/3 split of iris data into training and test set matrices
     
-    for(sample=0; sample< IRIS_SET_SIZE;  sample++)
+    for(sample = 0; sample< IRIS_SET_SIZE;  sample++)
       {
-        if(sample%3==0)
+        if(sample % 3 == 0)
           {
             for (feature=0;feature < IRISFEATURES;  feature++)
               testSet[testsamples][feature] = iris_data[sample][feature];
