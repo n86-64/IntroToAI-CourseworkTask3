@@ -26,17 +26,18 @@ int  train( double **trainingSamples, char *trainingLabels, int numSamples, int 
     int returnval = 1;
     int sample, feature;
     
-  
-    
     //clean the model because C leaves whatever is in the memory
-    for (sample=0; sample < NUM_TRAINING_SAMPLES; sample++) {
-        for (feature=0; feature<NUM_FEATURES; feature++) {
+    for (sample=0; sample < NUM_TRAINING_SAMPLES; sample++) 
+	{
+        for (feature=0; feature < NUM_FEATURES; feature++) 
+		{
             myModel[sample][feature] = 0.0;
         }
     }
     
     //sanity checking
-    if ( numFeatures > NUM_FEATURES || numSamples > NUM_TRAINING_SAMPLES) {
+    if ( numFeatures > NUM_FEATURES || numSamples > NUM_TRAINING_SAMPLES) 
+	{
         fprintf(stdout,"error: called train with data set larger than spaced allocated to store it");
         returnval=0;
     }
@@ -46,16 +47,18 @@ int  train( double **trainingSamples, char *trainingLabels, int numSamples, int 
     
     
     //make a simple copy of the data we are being passed but don't do anything with it
-    //I'm just giving you this for the sake of people less familiar with pointers etc.
+    // I'm just giving you this for the sake of people less familiar with pointers etc.
     
      
-     if(returnval==1) {
+     if(returnval == 1) {
         //store the labels and the feature values
         trainingSetSize = numSamples;
         int index,feature;
-        for (index=0; index < numSamples; index++) {
+        for (index=0; index < numSamples; index++)
+		{
             myModelLabels[index] = trainingLabels[index];
-            for (feature=0; feature < numFeatures; feature++) {
+            for (feature=0; feature < numFeatures; feature++) 
+			{
                 myModel[index][feature] = trainingSamples[index][feature];
             }
         }
