@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="exampleMain.c" />
+    <ClCompile Include="TrainAndTest.c">
+      <Filter>Training and Testing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IrisData.h" />
+    <ClInclude Include="TrainAndTest.h">
+      <Filter>Training and Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="MLCoursework.h">
+      <Filter>Ml Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Training and Testing">
+      <UniqueIdentifier>{c5e37122-e991-4c6b-b007-270c975343fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ml Headers">
+      <UniqueIdentifier>{b6ba7b91-a07a-4942-b8df-83f737e6b2bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
