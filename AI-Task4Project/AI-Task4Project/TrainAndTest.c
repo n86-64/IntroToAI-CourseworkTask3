@@ -33,6 +33,7 @@ static int classCounter = 0;
 static int trainingSetSize = 0;
 
 // performs insertion sort using indexes on K data. (Give data -1 value to ensure that it is inserted properly)
+// TODO - check to ensure algorithm is sorting properly. 
 void sortDataViaDistance(int* indexesToRead, double* valueDistance)
 {
 	int counter = 0;
