@@ -28,25 +28,9 @@ static char myModelLabels[NUM_TRAINING_SAMPLES];
 
 static int myModelIndex[NUM_TRAINING_SAMPLES];
 
+static int classCounter = 0;
+
 static int trainingSetSize = 0;
-
-int getClasses() 
-{
-	int classCounter = 0;
-	char className = '\0';
-
-	int i;
-	for (i = 0; i < NUM_TRAINING_SAMPLES; i++) 
-	{
-		if (myModelLabels[i] != className) 
-		{
-			className = myModelLabels[i];
-			classCounter++;
-		}
-	}
-
-	return classCounter;
-}
 
 // performs insertion sort using indexes on K data. (Give data -1 value to ensure that it is inserted properly)
 void sortDataViaDistance(int* indexesToRead, double* valueDistance)
@@ -90,15 +74,31 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance)
 }
 	
 
+void getClasses() 
+{
+	char currentChar = '\0';
+	
+	int i;
+	for (i = 0; i < NUM_TRAINING_SAMPLES; i++) 
+	{
+		if (currentChar != myModelLabels[i]) 
+		{
+			currentChar = myModelLabels[i];
+			classCounter++;
+		}
+	}
+
+}
+
 
 // retrieves distances between data points. 
-double getDistance(double* sample1, double* sample2) 
+double getDistance(double* sample1, double* sample2, int numFeatures) 
 {
 	double diffrence = 0;
 	double distance = 0;
 
 	int i;
-	for (i = 0; i < NUM_FEATURES; i++) 
+	for (i = 0; i < numFeatures; i++) 
 	{
 		diffrence = (sample1[i] - sample2[i]);
 		distance += sqrt(diffrence * diffrence);
@@ -111,8 +111,9 @@ double getDistance(double* sample1, double* sample2)
 int train( double **trainingSamples, char *trainingLabels, int numSamples, int numFeatures)
 {
     int returnval = 1;
+	int classValue;
     int sample, feature;
-	char classLabel = '\0';
+	char classLabels[5];
     
     //clean the model because C leaves whatever is in the memory
     for (sample = 0; sample < NUM_TRAINING_SAMPLES; sample++) 
@@ -143,6 +144,7 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
 		{
             myModelLabels[index] = trainingLabels[index];
 			myModelIndex[index] = index;
+			
 
             for (feature = 0; feature < numFeatures; feature++) 
 			{
@@ -152,6 +154,8 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
 
         fprintf(stdout,"data stored locally \n");
     }
+
+	getClasses(); // retrieves the lasses. Will need to check that the data is sorted and if not we will need to sort it. 
 
     //now you could do whatever you like with the data
     //for example,  you could populate some rules etc.
@@ -163,9 +167,8 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
     return returnval;
 }
 
-char  predictLabel(double *sample, int numFeatures)
+char predictLabel(double *sample, int numFeatures)
 {
-	int numberOfClasses;
 	int predictionInt = 0;
 	char prediction = '\0';
 
@@ -177,38 +180,23 @@ char  predictLabel(double *sample, int numFeatures)
 	// Do calculations for the distances in kNN. 
 	for (index = 0; index < NUM_TRAINING_SAMPLES; index++) 
 	{
-		ValueDistance[index] = getDistance(sample, &myModel[index]);
+		ValueDistance[index] = getDistance(sample, &myModel[index],numFeatures);
 	}
 
 	// retrieve the K nearest neighbours by finding the top k neighbours with the smallest distance. 
 	sortDataViaDistance(indexesToCheck, ValueDistance);
 
-	numberOfClasses = getClasses();
-	noOfClassVotes = calloc(numberOfClasses, sizeof(int));
+	noOfClassVotes = calloc(classCounter, sizeof(int));
 
-	int v;
-	for (v = 0; v < numberOfClasses; v++) 
+	int j;
+	for (j = 0; j < K_NEIGHBOURS; j++)
 	{
-		noOfClassVotes[v] = 0;
+		
 	}
 
-	// determine the number of nearest neighbours. 
-	int theClass = 0;
-	for (v = 0; v < K_NEIGHBOURS; v++) 
-	{
-		theClass = (((int)myModelLabels[indexesToCheck[v]]) - 97);
-		noOfClassVotes[theClass]++;
-	}
 
-	int i;
-	for (i = 0; i < numberOfClasses - 1; i++) 
-	{
-		if (noOfClassVotes[i + 1] > noOfClassVotes[i]) 
-		{
-			predictionInt = (i + 1);
-		}
-	}
 
+	// predictions are done via character type hence using integer tricks we can generate our prediction. 
 	prediction = (char)(97 + predictionInt);
 
 	// set and return prediction.
