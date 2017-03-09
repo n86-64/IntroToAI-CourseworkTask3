@@ -6,6 +6,8 @@
 //  Copyright © 2017 Jim SmithJim Smith. All rights reserved.
 //
 
+#pragma warning (disable: 4996)
+
 #include <stdio.h>
 
 #include "MLCoursework.h"
@@ -79,12 +81,12 @@ int main(int argc, const char * argv[])
     
     //call the train function
     ok = train( &trainingSet[0], trainingLabels ,trainingsamples, NUM_FEATURES);
+
     if( ok != 1)
       {
         printf("there was a problem running the train() function\n");
-        returnval=0;
+        returnval = 0;
       }
-    
     else
       {
         //print the results from the training set for information
@@ -116,6 +118,7 @@ int main(int argc, const char * argv[])
                 mySample[feature] = testSet[sample][feature];
             
             prediction = predictLabel(mySample, NUM_FEATURES);
+
             if (prediction == testLabels[sample])
                 correct++;
             else
@@ -130,7 +133,9 @@ int main(int argc, const char * argv[])
         
       }
     
-    
+	char inputChar = '/0';
+	scanf("%c", inputChar);
+
     return returnval;
     
 }
