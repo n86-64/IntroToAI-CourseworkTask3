@@ -197,7 +197,7 @@ char predictLabel(double *sample, int numFeatures)
 
 		if (ValueDistance[indexesToCheck[j]] == 0.0f) 
 		{
-			noOfClassVotes[myClass]+= 10;
+			noOfClassVotes[myClass] += 10;
 		}
 		else 
 		{
@@ -207,18 +207,19 @@ char predictLabel(double *sample, int numFeatures)
 
 
 	// check to see which class has the most votes. 
-
+	for (j = 0; j < classCounter; j++) 
+	{
+		if (noOfClassVotes[j] > noOfClassVotes[predictionInt]) 
+		{
+			predictionInt = j;
+		}
+	}
 
 	// predictions are done via character type hence using integer tricks we can generate our prediction. 
 	prediction = (char)(97 + predictionInt);
 
 	// set and return prediction.
 
-
-       //this is a silly trivial test function
-       // obviously you need to replace this with something that uses the model you built in your train() function
-       // char prediction = 'c';
-    
     return prediction;
 }
 
