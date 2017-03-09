@@ -100,6 +100,7 @@ int main(int argc, const char * argv[])
                 mySample[feature] = trainingSet[sample][feature];
             
             prediction = predictLabel( mySample, NUM_FEATURES);
+			printf("%c", prediction);
             if (prediction == trainingLabels[sample])
                 correct++;
             else

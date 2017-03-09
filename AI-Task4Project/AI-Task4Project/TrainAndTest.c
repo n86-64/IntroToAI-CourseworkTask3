@@ -207,7 +207,7 @@ char predictLabel(double *sample, int numFeatures)
 
 
 	// check to see which class has the most votes. 
-	for (j = 0; j < classCounter; j++) 
+	for (j = predictionInt + 1; j < classCounter; j++) 
 	{
 		if (noOfClassVotes[j] > noOfClassVotes[predictionInt]) 
 		{
