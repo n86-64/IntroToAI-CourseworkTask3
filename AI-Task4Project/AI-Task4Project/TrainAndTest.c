@@ -176,6 +176,7 @@ char predictLabel(double *sample, int numFeatures)
 	double ValueDistance[NUM_TRAINING_SAMPLES];
 	int* noOfClassVotes;
 	int indexesToCheck[K_NEIGHBOURS];
+	int myClass = 0;
 
 	// Do calculations for the distances in kNN. 
 	for (index = 0; index < NUM_TRAINING_SAMPLES; index++) 
@@ -191,9 +192,21 @@ char predictLabel(double *sample, int numFeatures)
 	int j;
 	for (j = 0; j < K_NEIGHBOURS; j++)
 	{
-		
+		myClass = myModelLabels[indexesToCheck[j]];
+		myClass -= 97;
+
+		if (ValueDistance[indexesToCheck[j]] == 0.0f) 
+		{
+			noOfClassVotes[myClass]+= 10;
+		}
+		else 
+		{
+			noOfClassVotes[myClass]++;
+		}
 	}
 
+
+	// check to see which class has the most votes. 
 
 
 	// predictions are done via character type hence using integer tricks we can generate our prediction. 
