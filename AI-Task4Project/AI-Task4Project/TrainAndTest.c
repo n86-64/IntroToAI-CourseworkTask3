@@ -9,6 +9,9 @@
 //  Copyright © 2017 Jim SmithJim Smith. All rights reserved.
 //
 
+// TODO - Check how the data is going to be recieved and whether the data will be sourted because if not we will need to run a quicksort
+// during the training phase. 
+
 #include <math.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -16,8 +19,7 @@
 
 #include "TrainAndTest.h"
 
-#define K_NEIGHBOURS 5
-#define NUM_CLASSES 10
+#define K_NEIGHBOURS 6
 
 //declare this array as static but make it available to any function in this file
 //in case we want to store the training examples and use them later
@@ -34,7 +36,6 @@ static int* noOfClassVotes = NULL;
 static int trainingSetSize = 0;
 
 // performs insertion sort using indexes on K data.
-// TODO - check to ensure algorithm is sorting properly. 
 // BUG - Pointer operations not working. (FIXED)
 void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSamples)
 {
