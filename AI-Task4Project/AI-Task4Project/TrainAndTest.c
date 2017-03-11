@@ -55,11 +55,11 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSampl
 	{
 		ptrValue = valueDistance[example];
 
-		// For each sample perform an insertion sort. 
+		// For each sample perform an insertion sort if nessecery.
 		if (distanceVal[K_NEIGHBOURS - 1] > ptrValue) 
 		{
 			distanceVal[K_NEIGHBOURS - 1] = ptrValue;
-			indexesToRead[K_NEIGHBOURS - 1] = myModelIndex[example];
+			indexesToRead[K_NEIGHBOURS - 1] = example;
 
 			// insersion sort here.
 			for (example2 = K_NEIGHBOURS - 1; example2 > 0; example2--) 
@@ -73,6 +73,10 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSampl
 
 					distanceVal[example2] = tmpDistance;
 					indexesToRead[example2] = tmpIndex;
+				}
+				else 
+				{
+					break;
 				}
 			}
 		}
@@ -196,7 +200,7 @@ char predictLabel(double *sample, int numFeatures)
 	int j;
 	for (j = 0; j < K_NEIGHBOURS; j++)
 	{
-		myClass = myModelLabels[indexesToCheck[j]];
+		myClass = (int)myModelLabels[indexesToCheck[j]];
 		myClass -= 97;
 
 		if (ValueDistance[indexesToCheck[j]] == 0.0f) 
@@ -217,6 +221,13 @@ char predictLabel(double *sample, int numFeatures)
 		{
 			predictionInt = j;
 		}
+	}
+
+	// clean out votes for next run. 
+	int k;
+	for (k = 0; k < classCounter; k++) 
+	{
+		noOfClassVotes[k] = 0;
 	}
 
 	// predictions are done via character type hence using integer tricks we can generate our prediction. 

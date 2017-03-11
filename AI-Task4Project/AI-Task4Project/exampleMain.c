@@ -124,7 +124,7 @@ int main(int argc, const char * argv[])
                 correct++;
             else
               {
-                //printf("actual = %c predicted = %c\n", testLabels[sample], prediction );
+                printf("actual = %c predicted = %c\n", testLabels[sample], prediction );
                 wrong++;
               }
           }
@@ -134,8 +134,8 @@ int main(int argc, const char * argv[])
         
       }
     
-	char inputChar = '/0';
-	scanf("%c", inputChar);
+	//char inputChar = '/0';
+//	scanf("%c", inputChar);
 
     return returnval;
     
