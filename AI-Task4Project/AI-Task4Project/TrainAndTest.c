@@ -29,30 +29,36 @@ static char myModelLabels[NUM_TRAINING_SAMPLES];
 static int myModelIndex[NUM_TRAINING_SAMPLES];
 
 static int classCounter = 0;
+static int* noOfClassVotes = NULL;
 
 static int trainingSetSize = 0;
 
-// performs insertion sort using indexes on K data. (Give data -1 value to ensure that it is inserted properly)
+// performs insertion sort using indexes on K data.
 // TODO - check to ensure algorithm is sorting properly. 
-void sortDataViaDistance(int* indexesToRead, double* valueDistance)
+// BUG - Pointer operations not working. (FIXED)
+void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSamples)
 {
 	int counter = 0;
 	double distanceVal[K_NEIGHBOURS];
 	int example, example2;
-	double tmpIndex = 0, tmpDistance = 0;
+	double tmpIndex = 0.0f, tmpDistance = 0.0f;
+	double ptrValue = 0.0f;
 
+	// initialise the array. 
 	int i;
-
-	for (i = 0; i < K_NEIGHBOURS; i++) // initialise the array. 
+	for (i = 0; i < K_NEIGHBOURS; i++)
 	{
-		distanceVal[i] = LONG_MAX;
+		distanceVal[i] = (double)LONG_MAX;
 	}
 
-	for (example = 0; example < NUM_SAMPLES; example++)
+	for (example = 0; example < numSamples; example++)
 	{
-		if (distanceVal[K_NEIGHBOURS - 1] > valueDistance[example]) 
+		ptrValue = valueDistance[example];
+
+		// For each sample perform an insertion sort. 
+		if (distanceVal[K_NEIGHBOURS - 1] > ptrValue) 
 		{
-			distanceVal[K_NEIGHBOURS - 1] = valueDistance[example];
+			distanceVal[K_NEIGHBOURS - 1] = ptrValue;
 			indexesToRead[K_NEIGHBOURS - 1] = myModelIndex[example];
 
 			// insersion sort here.
@@ -70,7 +76,6 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance)
 				}
 			}
 		}
-		// For each sample perform an insertion sort. 
 	}
 }
 	
@@ -144,7 +149,6 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
         for (index = 0; index < numSamples; index++)
 		{
             myModelLabels[index] = trainingLabels[index];
-			myModelIndex[index] = index;
 			
 
             for (feature = 0; feature < numFeatures; feature++) 
@@ -157,6 +161,7 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
     }
 
 	getClasses(); // retrieves the lasses. Will need to check that the data is sorted and if not we will need to sort it. 
+	noOfClassVotes = calloc(classCounter, sizeof(int));
 
     //now you could do whatever you like with the data
     //for example,  you could populate some rules etc.
@@ -175,7 +180,6 @@ char predictLabel(double *sample, int numFeatures)
 
 	int index = 0;
 	double ValueDistance[NUM_TRAINING_SAMPLES];
-	int* noOfClassVotes;
 	int indexesToCheck[K_NEIGHBOURS];
 	int myClass = 0;
 
@@ -186,9 +190,8 @@ char predictLabel(double *sample, int numFeatures)
 	}
 
 	// retrieve the K nearest neighbours by finding the top k neighbours with the smallest distance. 
-	sortDataViaDistance(indexesToCheck, ValueDistance);
+	sortDataViaDistance(indexesToCheck, ValueDistance, NUM_TRAINING_SAMPLES);
 
-	noOfClassVotes = calloc(classCounter, sizeof(int));
 
 	int j;
 	for (j = 0; j < K_NEIGHBOURS; j++)
