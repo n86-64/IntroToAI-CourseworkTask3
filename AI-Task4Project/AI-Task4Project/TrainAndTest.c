@@ -13,12 +13,11 @@
 // during the training phase. 
 
 #include <math.h>
-#include <stdlib.h>
-
 #include "TrainAndTest.h"
 
 #define K_NEIGHBOURS 6
 #define CLASS_MAX   256
+#define LONG_MAX    10000000
 
 //declare this array as static but make it available to any function in this file
 //in case we want to store the training examples and use them later
