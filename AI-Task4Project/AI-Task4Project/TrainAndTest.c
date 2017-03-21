@@ -19,7 +19,8 @@
 
 #include "TrainAndTest.h"
 
-#define K_NEIGHBOURS 6
+#define K_NEIGHBOURS 1
+#define CLASS_MAX   256
 
 //declare this array as static but make it available to any function in this file
 //in case we want to store the training examples and use them later
@@ -31,6 +32,11 @@ static char myModelLabels[NUM_TRAINING_SAMPLES];
 static int myModelIndex[NUM_TRAINING_SAMPLES];
 
 static int classCounter = 0;
+
+// fix for the marking system. 
+static int classFrequency[CLASS_MAX]; 
+
+
 static int* noOfClassVotes = NULL;
 
 static int trainingSetSize = 0;
@@ -165,8 +171,8 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
         fprintf(stdout,"data stored locally \n");
     }
 
-	getClasses(); // retrieves the lasses. Will need to check that the data is sorted and if not we will need to sort it. 
-	noOfClassVotes = calloc(classCounter, sizeof(int));
+	// getClasses(); // retrieves the lasses. Will need to check that the data is sorted and if not we will need to sort it. 
+	// noOfClassVotes = calloc(classCounter, sizeof(int));
 
     //now you could do whatever you like with the data
     //for example,  you could populate some rules etc.
@@ -197,8 +203,33 @@ char predictLabel(double *sample, int numFeatures)
 	// retrieve the K nearest neighbours by finding the top k neighbours with the smallest distance. 
 	sortDataViaDistance(indexesToCheck, ValueDistance, NUM_TRAINING_SAMPLES);
 
+	int k;
+	int theClass;
+	for (k = 0; k < K_NEIGHBOURS; k++) 
+	{
+		if (ValueDistance[indexesToCheck[k]] == 0.0f) 
+		{
+			classFrequency[(int)myModelLabels[indexesToCheck[k]]] += 10;
+		}
+		else 
+		{
+			classFrequency[(int)myModelLabels[indexesToCheck[k]]]++;
+		}
+	}
 
-	int j;
+	for (theClass = 0; theClass < CLASS_MAX; theClass++) 
+	{
+		if (classFrequency[theClass] > (int)classFrequency[prediction]) 
+		{
+			prediction = (char)theClass;
+		}
+	}
+
+
+
+
+
+	/*int j;
 	for (j = 0; j < K_NEIGHBOURS; j++)
 	{
 		myClass = (int)myModelLabels[indexesToCheck[j]];
@@ -212,27 +243,26 @@ char predictLabel(double *sample, int numFeatures)
 		{
 			noOfClassVotes[myClass]++;
 		}
-	}
+	}*/
 
 
 	// check to see which class has the most votes. 
-	for (j = predictionInt + 1; j < classCounter; j++) 
-	{
-		if (noOfClassVotes[j] > noOfClassVotes[predictionInt]) 
-		{
-			predictionInt = j;
-		}
-	}
+	//for (j = predictionInt + 1; j < classCounter; j++) 
+	//{
+	//	if (noOfClassVotes[j] > noOfClassVotes[predictionInt]) 
+	//	{
+	//		predictionInt = j;
+	//	}
+	//}
 
 	// clean out votes for next run. 
-	int k;
-	for (k = 0; k < classCounter; k++) 
+	for (k = 0; k < CLASS_MAX; k++) 
 	{
-		noOfClassVotes[k] = 0;
+		classFrequency[k] = 0;
 	}
 
-	// predictions are done via character type hence using integer tricks we can generate our prediction. 
-	prediction = (char)(97 + predictionInt);
+	//// predictions are done via character type hence using integer tricks we can generate our prediction. 
+	//prediction = (char)(97 + predictionInt);
 
 	// set and return prediction.
 
