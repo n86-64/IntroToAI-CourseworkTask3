@@ -29,13 +29,8 @@ static char myModelLabels[NUM_TRAINING_SAMPLES];
 
 static int myModelIndex[NUM_TRAINING_SAMPLES];
 
-static int classCounter = 0;
-
 // fix for the marking system. 
 static int classFrequency[CLASS_MAX]; 
-
-
-static int* noOfClassVotes = NULL;
 
 static int trainingSetSize = 0;
 
@@ -86,23 +81,6 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSampl
 			}
 		}
 	}
-}
-	
-
-void getClasses() 
-{
-	char currentChar = '\0';
-	
-	int i;
-	for (i = 0; i < NUM_TRAINING_SAMPLES; i++) 
-	{
-		if (currentChar != myModelLabels[i]) 
-		{
-			currentChar = myModelLabels[i];
-			classCounter++;
-		}
-	}
-
 }
 
 
@@ -169,9 +147,6 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
         fprintf(stdout,"data stored locally \n");
     }
 
-	// getClasses(); // retrieves the lasses. Will need to check that the data is sorted and if not we will need to sort it. 
-	// noOfClassVotes = calloc(classCounter, sizeof(int));
-
     //now you could do whatever you like with the data
     //for example,  you could populate some rules etc.
     //you were given pseudocode in semester 1 to do this
@@ -201,6 +176,7 @@ char predictLabel(double *sample, int numFeatures)
 	// retrieve the K nearest neighbours by finding the top k neighbours with the smallest distance. 
 	sortDataViaDistance(indexesToCheck, ValueDistance, NUM_TRAINING_SAMPLES);
 
+	// counts the frequency of classification. 
 	int k;
 	int theClass;
 	for (k = 0; k < K_NEIGHBOURS; k++) 
@@ -223,49 +199,12 @@ char predictLabel(double *sample, int numFeatures)
 		}
 	}
 
-
-
-
-
-	/*int j;
-	for (j = 0; j < K_NEIGHBOURS; j++)
-	{
-		myClass = (int)myModelLabels[indexesToCheck[j]];
-		myClass -= 97;
-
-		if (ValueDistance[indexesToCheck[j]] == 0.0f) 
-		{
-			noOfClassVotes[myClass] += 10;
-		}
-		else 
-		{
-			noOfClassVotes[myClass]++;
-		}
-	}*/
-
-
-	// check to see which class has the most votes. 
-	//for (j = predictionInt + 1; j < classCounter; j++) 
-	//{
-	//	if (noOfClassVotes[j] > noOfClassVotes[predictionInt]) 
-	//	{
-	//		predictionInt = j;
-	//	}
-	//}
-
 	// clean out votes for next run. 
 	for (k = 0; k < CLASS_MAX; k++) 
 	{
 		classFrequency[k] = 0;
 	}
 
-	//// predictions are done via character type hence using integer tricks we can generate our prediction. 
-	//prediction = (char)(97 + predictionInt);
-
 	// set and return prediction.
-
     return prediction;
 }
-
-
-// We are going to impliment a form of kNN. 
