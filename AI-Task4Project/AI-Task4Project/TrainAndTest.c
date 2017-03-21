@@ -13,9 +13,7 @@
 // during the training phase. 
 
 #include <math.h>
-#include <limits.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "TrainAndTest.h"
 
