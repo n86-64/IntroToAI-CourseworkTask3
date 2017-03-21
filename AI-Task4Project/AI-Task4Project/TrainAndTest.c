@@ -17,7 +17,7 @@
 
 #include "TrainAndTest.h"
 
-#define K_NEIGHBOURS 1
+#define K_NEIGHBOURS 6
 #define CLASS_MAX   256
 
 //declare this array as static but make it available to any function in this file
