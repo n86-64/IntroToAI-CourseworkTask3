@@ -9,15 +9,15 @@
 //  Copyright © 2017 Jim SmithJim Smith. All rights reserved.
 //
 
-#include <math.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <stdio.h>
+// TODO - Check how the data is going to be recieved and whether the data will be sourted because if not we will need to run a quicksort
+// during the training phase. 
 
+#include <math.h>
 #include "TrainAndTest.h"
 
-#define K_NEIGHBOURS 5
-#define NUM_CLASSES 10
+#define K_NEIGHBOURS 6
+#define CLASS_MAX   256
+#define LONG_MAX    10000000
 
 //declare this array as static but make it available to any function in this file
 //in case we want to store the training examples and use them later
@@ -28,47 +28,37 @@ static char myModelLabels[NUM_TRAINING_SAMPLES];
 
 static int myModelIndex[NUM_TRAINING_SAMPLES];
 
+// fix for the marking system. 
+static int classFrequency[CLASS_MAX]; 
+
 static int trainingSetSize = 0;
 
-int getClasses() 
-{
-	int classCounter = 0;
-	char className = '\0';
-
-	int i;
-	for (i = 0; i < NUM_TRAINING_SAMPLES; i++) 
-	{
-		if (myModelLabels[i] != className) 
-		{
-			className = myModelLabels[i];
-			classCounter++;
-		}
-	}
-
-	return classCounter;
-}
-
-// performs insertion sort using indexes on K data. (Give data -1 value to ensure that it is inserted properly)
-void sortDataViaDistance(int* indexesToRead, double* valueDistance)
+// performs insertion sort using indexes on K data.
+// BUG - Pointer operations not working. (FIXED)
+void sortDataViaDistance(int* indexesToRead, double* valueDistance, int numSamples)
 {
 	int counter = 0;
 	double distanceVal[K_NEIGHBOURS];
 	int example, example2;
-	double tmpIndex = 0, tmpDistance = 0;
+	double tmpIndex = 0.0f, tmpDistance = 0.0f;
+	double ptrValue = 0.0f;
 
+	// initialise the array. 
 	int i;
-
-	for (i = 0; i < K_NEIGHBOURS; i++) // initialise the array. 
+	for (i = 0; i < K_NEIGHBOURS; i++)
 	{
-		distanceVal[i] = LONG_MAX;
+		distanceVal[i] = (double)LONG_MAX;
 	}
 
-	for (example = 0; example < NUM_SAMPLES; example++)
+	for (example = 0; example < numSamples; example++)
 	{
-		if (distanceVal[K_NEIGHBOURS - 1] > valueDistance[example]) 
+		ptrValue = valueDistance[example];
+
+		// For each sample perform an insertion sort if nessecery.
+		if (distanceVal[K_NEIGHBOURS - 1] > ptrValue) 
 		{
-			distanceVal[K_NEIGHBOURS - 1] = valueDistance[example];
-			indexesToRead[K_NEIGHBOURS - 1] = myModelIndex[example];
+			distanceVal[K_NEIGHBOURS - 1] = ptrValue;
+			indexesToRead[K_NEIGHBOURS - 1] = example;
 
 			// insersion sort here.
 			for (example2 = K_NEIGHBOURS - 1; example2 > 0; example2--) 
@@ -83,22 +73,24 @@ void sortDataViaDistance(int* indexesToRead, double* valueDistance)
 					distanceVal[example2] = tmpDistance;
 					indexesToRead[example2] = tmpIndex;
 				}
+				else 
+				{
+					break;
+				}
 			}
 		}
-		// For each sample perform an insertion sort. 
 	}
 }
-	
 
 
 // retrieves distances between data points. 
-double getDistance(double* sample1, double* sample2) 
+double getDistance(double* sample1, double* sample2, int numFeatures) 
 {
 	double diffrence = 0;
 	double distance = 0;
 
 	int i;
-	for (i = 0; i < NUM_FEATURES; i++) 
+	for (i = 0; i < numFeatures; i++) 
 	{
 		diffrence = (sample1[i] - sample2[i]);
 		distance += sqrt(diffrence * diffrence);
@@ -111,8 +103,9 @@ double getDistance(double* sample1, double* sample2)
 int train( double **trainingSamples, char *trainingLabels, int numSamples, int numFeatures)
 {
     int returnval = 1;
+	int classValue;
     int sample, feature;
-	char classLabel = '\0';
+	char classLabels[5];
     
     //clean the model because C leaves whatever is in the memory
     for (sample = 0; sample < NUM_TRAINING_SAMPLES; sample++) 
@@ -142,7 +135,7 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
         for (index = 0; index < numSamples; index++)
 		{
             myModelLabels[index] = trainingLabels[index];
-			myModelIndex[index] = index;
+			
 
             for (feature = 0; feature < numFeatures; feature++) 
 			{
@@ -163,63 +156,54 @@ int train( double **trainingSamples, char *trainingLabels, int numSamples, int n
     return returnval;
 }
 
-char  predictLabel(double *sample, int numFeatures)
+char predictLabel(double *sample, int numFeatures)
 {
-	int numberOfClasses;
 	int predictionInt = 0;
 	char prediction = '\0';
 
 	int index = 0;
 	double ValueDistance[NUM_TRAINING_SAMPLES];
-	int* noOfClassVotes;
 	int indexesToCheck[K_NEIGHBOURS];
+	int myClass = 0;
 
 	// Do calculations for the distances in kNN. 
 	for (index = 0; index < NUM_TRAINING_SAMPLES; index++) 
 	{
-		ValueDistance[index] = getDistance(sample, &myModel[index]);
+		ValueDistance[index] = getDistance(sample, &myModel[index],numFeatures);
 	}
 
 	// retrieve the K nearest neighbours by finding the top k neighbours with the smallest distance. 
-	sortDataViaDistance(indexesToCheck, ValueDistance);
+	sortDataViaDistance(indexesToCheck, ValueDistance, NUM_TRAINING_SAMPLES);
 
-	numberOfClasses = getClasses();
-	noOfClassVotes = calloc(numberOfClasses, sizeof(int));
-
-	int v;
-	for (v = 0; v < numberOfClasses; v++) 
+	// counts the frequency of classification. 
+	int k;
+	int theClass;
+	for (k = 0; k < K_NEIGHBOURS; k++) 
 	{
-		noOfClassVotes[v] = 0;
-	}
-
-	// determine the number of nearest neighbours. 
-	int theClass = 0;
-	for (v = 0; v < K_NEIGHBOURS; v++) 
-	{
-		theClass = (((int)myModelLabels[indexesToCheck[v]]) - 97);
-		noOfClassVotes[theClass]++;
-	}
-
-	int i;
-	for (i = 0; i < numberOfClasses - 1; i++) 
-	{
-		if (noOfClassVotes[i + 1] > noOfClassVotes[i]) 
+		if (ValueDistance[indexesToCheck[k]] == 0.0f) 
 		{
-			predictionInt = (i + 1);
+			classFrequency[(int)myModelLabels[indexesToCheck[k]]] += 10;
+		}
+		else 
+		{
+			classFrequency[(int)myModelLabels[indexesToCheck[k]]]++;
 		}
 	}
 
-	prediction = (char)(97 + predictionInt);
+	for (theClass = 0; theClass < CLASS_MAX; theClass++) 
+	{
+		if (classFrequency[theClass] > (int)classFrequency[prediction]) 
+		{
+			prediction = (char)theClass;
+		}
+	}
+
+	// clean out votes for next run. 
+	for (k = 0; k < CLASS_MAX; k++) 
+	{
+		classFrequency[k] = 0;
+	}
 
 	// set and return prediction.
-
-
-       //this is a silly trivial test function
-       // obviously you need to replace this with something that uses the model you built in your train() function
-       // char prediction = 'c';
-    
     return prediction;
 }
-
-
-// We are going to impliment a form of kNN. 
