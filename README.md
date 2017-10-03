@@ -1,2 +1,2 @@
 # IntroToAI-CourseworkTask3
-An implementation of a mechanic learning algorithm to classify data. 
+An implementation of a mechiene learning algorithm (kNN) to classify data. 
